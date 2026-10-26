@@ -35,19 +35,42 @@ public:
   }
   TDynamicVector(const TDynamicVector& v)
   {
+      sz = v.sz;
+      pMem = new T[sz];
+      for (int i = 0; i < sz; i++)
+          pMem[i] = v.pMem[i];
   }
   TDynamicVector(TDynamicVector&& v) noexcept
   {
+      pMem = v.pMem;
+      sz = v.sz;
+      v.pMem = nullptr;
+      v.sz = 0;
   }
   ~TDynamicVector()
   {
+      delete[] pMem;
   }
   TDynamicVector& operator=(const TDynamicVector& v)
   {
+    if(&v == this)
+        return *this;
+    sz = v.sz;
+    delete[] pMem;
+    pMem = new T[sz];
+    for (int i = 0; i < sz; i++)
+        pMem[i] = v.pMem[i];
     return *this;
   }
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
+    if (&v == this)
+        return *this;
+     delete[] pMem;
+     pMem = v.pMem;
+     sz = v.sz;
+     v.pMem = nullptr;
+     v.sz = 0;
     return *this;
   }
 
@@ -56,34 +79,50 @@ public:
   // индексация
   T& operator[](size_t ind)
   {
-    throw "Not implemented";
-    return pMem[0];
+    return pMem[ind];
   }
   const T& operator[](size_t ind) const
   {
-    throw "Not implemented";
-    return pMem[0];
+    return pMem[ind];
   }
   // индексация с контролем
   T& at(size_t ind)
   {
-    throw "Not implemented";
-    return pMem[0];
+    if ((ind < 0) || (ind >= sz))
+        throw "Not implemented";
+    return pMem[ind];
   }
   const T& at(size_t ind) const
   {
-    throw "Not implemented";
-    return pMem[0];
+    if ((ind < 0) || (ind >= sz))
+        throw "Not implemented";
+    return pMem[ind];
   }
 
   // сравнение
   bool operator==(const TDynamicVector& v) const noexcept
   {
-    return false;
+      if (sz == v.sz) {
+          for (int i = 0; i < v.sz; i++) {
+              if (v.pMem[i] != pMem[i])
+                  return false;
+          }
+          return true;
+      }
+      else
+          throw "Uncomparable vectors";
   }
   bool operator!=(const TDynamicVector& v) const noexcept
   {
-    return false;
+      if (sz == v.sz) {
+          for (int i = 0; i < v.sz; i++) {
+              if (v.pMem[i] == pMem[i])
+                  return false;
+          }
+          return true;
+      }
+      else
+          throw "Uncomparable vectors";
   }
 
   // скалярные операции

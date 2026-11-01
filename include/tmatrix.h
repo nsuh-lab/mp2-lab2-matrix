@@ -25,6 +25,8 @@ public:
   {
     if (sz == 0)
       throw std::out_of_range("Vector size should be greater than zero");
+    if (sz < 0)
+        throw "Vector size is negative";
     if (sz > MAX_VECTOR_SIZE)
         throw "Vector size is bigger than max vector size";
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
@@ -37,7 +39,7 @@ public:
     pMem = new T[sz];
     std::copy(arr, arr + sz, pMem);
   }
-  TDynamicVector(const TDynamicVector& v)
+  TDynamicVector(const TDynamicVector& v) 
   {
       sz = v.sz;
       pMem = new T[sz];
@@ -92,13 +94,13 @@ public:
   // индексация с контролем
   T& at(size_t ind)
   {
-    if ((ind < 0) || (ind >= sz))
+    if ((ind < 0) || (ind >= sz) || (ind >= MAX_VECTOR_SIZE - 1))
         throw "Not implemented";
     return pMem[ind];
   }
   const T& at(size_t ind) const
   {
-    if ((ind < 0) || (ind >= sz))
+    if ((ind < 0) || (ind >= sz) || (ind >= MAX_VECTOR_SIZE - 1))
         throw "Not implemented";
     return pMem[ind];
   }
@@ -114,7 +116,7 @@ public:
           return true;
       }
       else
-          throw "Uncomparable vectors";
+          return false;
   }
   bool operator!=(const TDynamicVector& v) const noexcept
   {
@@ -126,7 +128,7 @@ public:
           return true;
       }
       else
-          throw "Uncomparable vectors";
+          return true;
   }
 
   // скалярные операции
@@ -158,57 +160,39 @@ public:
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
-    int size = 0;
-    if (sz > v.size()) {
-        size = sz;
-        TDynamicVector tmp(size);
-        tmp = *this;
-        for (int i = 0; i < v.size(); i++)
+    if (sz == v.size()) {
+        TDynamicVector tmp(sz);
+        for (int i = 0; i < sz; i++)
             tmp[i] = pMem[i] + v[i];
         return tmp;
     }
     else {
-        size = v.size();
-        TDynamicVector tmp(size);
-        tmp = v;
-        for (int i = 0; i < sz; i++)
-            tmp[i] = pMem[i] + v[i];
-        return tmp;
+        throw "Add vectors with different sizes";
     }
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
-     int size = 0;
-     if (sz > v.size()) {
-         size = sz;
-         TDynamicVector tmp(size);
-         tmp = *this;
-         for (int i = 0; i < v.size(); i++)
-             tmp[i] = pMem[i] - v[i];
-         return tmp;
-     }
-     else {
-         size = v.size();
-         TDynamicVector tmp(size);
-         tmp = v;
-         for (int i = 0; i < sz; i++)
-             tmp[i] = pMem[i] - v[i];
-         return tmp;
-     }
+      if (sz == v.size()) {
+          TDynamicVector tmp(sz);
+          for (int i = 0; i < sz; i++)
+              tmp[i] = pMem[i] - v[i];
+          return tmp;
+      }
+      else {
+          throw "Subtract vectors with different sizes";
+      }
   }
   T operator*(const TDynamicVector& v) //noexcept(noexcept(T()))
   {
-    T res;
-    if (sz > v.sz) {
-        for (int i = 0; i < v.sz; i++)
-            res += pMem[i] * v[i];
-        return res;
-    }
-    else {
-        for (int i = 0; i < sz; i++)
-            res += pMem[i] * v[i];
-        return res;
-    }
+      if (sz == v.size()) {
+          T res{};
+          for (int i = 0; i < sz; i++)
+              res += pMem[i] * v[i];
+          return res;
+      }
+      else {
+          throw "Multiply vectors with different sizes";
+      }
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept

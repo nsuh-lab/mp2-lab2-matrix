@@ -91,7 +91,29 @@ TEST(TDynamicMatrix, matrices_with_different_size_are_not_equal)
 
 TEST(TDynamicMatrix, can_add_matrices_with_equal_size)
 {
-  ADD_FAILURE();
+	TDynamicMatrix<int> m(2);
+	TDynamicMatrix<int> m1(2);
+	TDynamicMatrix<int> res(2);
+	TDynamicMatrix<int> expected(2);
+
+	m[0][0] = 1;
+	m[0][1] = 2;
+	m[1][0] = 2;
+	m[1][1] = 1;
+
+	m1[0][0] = 1;
+	m1[0][1] = 2;
+	m1[1][0] = 2;
+	m1[1][1] = 1;
+
+	expected[0][0] = 2;
+	expected[0][1] = 4;
+	expected[1][0] = 4;
+	expected[1][1] = 2;
+
+	res = m + m1;
+
+	EXPECT_EQ(res, expected);
 }
 
 TEST(TDynamicMatrix, cant_add_matrices_with_not_equal_size)

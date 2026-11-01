@@ -30,8 +30,8 @@ public:
     if (sz > MAX_VECTOR_SIZE)
         throw "Vector size is bigger than max vector size";
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
-    for (int i = 0; i < sz; i++)
-        pMem[i] = 0;
+    //for (int i = 0; i < sz; i++)
+        //pMem[i] = 0;
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
   {
@@ -53,6 +53,7 @@ public:
       v.pMem = nullptr;
       v.sz = 0;
   }
+
   ~TDynamicVector()
   {
       delete[] pMem;
@@ -137,7 +138,7 @@ public:
     TDynamicVector tmp(sz);
     tmp = *this;
     for (int i = 0; i < sz; i++)
-        tmp.pMem[i] += val;
+        tmp.pMem[i] = tmp.pMem[i] + val;
     return tmp;
   }
   TDynamicVector operator-(double val)
@@ -145,7 +146,7 @@ public:
     TDynamicVector tmp(sz);
     tmp = *this;
     for (int i = 0; i < sz; i++)
-        tmp.pMem[i] -= val;
+        tmp.pMem[i] = tmp.pMem[i] - val;
     return tmp;
   }
   TDynamicVector operator*(double val)
@@ -153,7 +154,7 @@ public:
     TDynamicVector tmp(sz);
     tmp = *this;
     for (int i = 0; i < sz; i++)
-        tmp.pMem[i] *= val;
+        tmp.pMem[i] = tmp.pMem[i] * val;
     return tmp;
   }
 
@@ -231,48 +232,83 @@ public:
       pMem[i] = TDynamicVector<T>(sz);
   }
 
+  TDynamicMatrix(TDynamicVector<T> v){
+      sz = std::sqrt(v.size());
+      delete[] pMem;
+      pMem = new TDynamicVector<T>[sz];
+      for (int k = 0; k < sz; k++) {
+          TDynamicVector<T> tmp(sz);
+          for (size_t i = 0; i < sz; i++)
+              tmp[i] = v[i + k * sz];
+          pMem[k] = tmp;
+      }
+  }
+
   using TDynamicVector<TDynamicVector<T>>::operator[];
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
   {
-    return false;
+    return TDynamicVector<TDynamicVector<T>>::operator==(m);
+  }
+  operator TDynamicVector<T>() {
+      TDynamicVector<T> v(sz*sz);
+
+      for (size_t i = 0; i < sz; i++)
+          for (size_t j = 0; j < sz; j++)
+              v[i * sz + j] = pMem[i][j];
+      return v;
   }
 
   // матрично-скалярные операции
   TDynamicMatrix<T> operator*(const T& val)
   {
-    return TDynamicMatrix<T>{};
+      TDynamicMatrix tmp(sz);
+      for (size_t i = 0; i < sz; i++)
+          tmp.pMem[i] = pMem[i] * val;
+      return tmp;
   }
 
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-    return TDynamicVector<T>{};
+      TDynamicVector<T> v(sz);
+      for (int i = 0; i < sz; i++)
+          for (int j = 0; j < sz; j++)
+              v[i] += pMem[i][j] * v[j];
   }
 
   // матрично-матричные операции
-  TDynamicMatrix operator+(const TDynamicMatrix& m)
+  TDynamicMatrix operator+(TDynamicMatrix& m)
   {
-    // можно ли написать реализацию, используя operator+ вектора?
-    return TDynamicMatrix<T>{};
+    return TDynamicMatrix((TDynamicVector<T>)(*this) + (TDynamicVector<T>)m);
   }
   TDynamicMatrix operator-(const TDynamicMatrix& m)
   {
-    return TDynamicMatrix<T>{};
+    return TDynamicMatrix((TDynamicVector<T>)(*this) - (TDynamicVector<T>)m);
   }
   TDynamicMatrix operator*(const TDynamicMatrix& m)
   {
-    return TDynamicMatrix<T>{};
+    TDynamicMatrix matr(m.sz);
+    for (int i = 0; i < m.sz; i++)
+        for (int k = 0; k < m.sz; k++)
+            for (int j = 0; j < m.sz; j++)
+                matr[i][j] += pMem[i][k] * m[k][j];
+    return matr;
   }
 
   // ввод/вывод
   friend std::istream& operator>>(std::istream& istr, TDynamicMatrix& v)
   {
+      for (size_t i = 0; i < v.sz; i++)
+          for (size_t j = 0; j < v.sz; j++)
+              istr >> v[i][j];
     return istr;
   }
   friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
+      for (int i = 0; i < v.sz; i++)
+          ostr << v[i];
     return ostr;
   }
 };

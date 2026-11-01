@@ -281,10 +281,11 @@ public:
   // матрично-векторные операции
   TDynamicVector<T> operator*(const TDynamicVector<T>& v)
   {
-      TDynamicVector<T> v(sz);
+      TDynamicVector<T> tmp(v);
       for (int i = 0; i < sz; i++)
           for (int j = 0; j < sz; j++)
-              v[i] += pMem[i][j] * v[j];
+              tmp[i] += pMem[i][j] * v[j];
+      return tmp;
   }
 
   // матрично-матричные операции

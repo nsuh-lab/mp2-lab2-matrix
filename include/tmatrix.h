@@ -123,10 +123,10 @@ public:
   {
       if (sz == v.sz) {
           for (int i = 0; i < v.sz; i++) {
-              if (v.pMem[i] == pMem[i])
-                  return false;
+              if (v.pMem[i] != pMem[i])
+                  return true;
           }
-          return true;
+          return false;
       }
       else
           return true;
@@ -228,6 +228,8 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 public:
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
+    if (s > MAX_MATRIX_SIZE)
+      throw "Matrix size is too large";
     for (size_t i = 0; i < sz; i++)
       pMem[i] = TDynamicVector<T>(sz);
   }
@@ -245,11 +247,17 @@ public:
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
+  using TDynamicVector<TDynamicVector<T>>::at;
 
   // сравнение
   bool operator==(const TDynamicMatrix& m) const noexcept
   {
     return TDynamicVector<TDynamicVector<T>>::operator==(m);
+  }
+
+  bool operator!=(const TDynamicMatrix& m) const noexcept
+  {
+      return TDynamicVector<TDynamicVector<T>>::operator!=(m);
   }
   operator TDynamicVector<T>() {
       TDynamicVector<T> v(sz*sz);
@@ -283,7 +291,7 @@ public:
   {
     return TDynamicMatrix((TDynamicVector<T>)(*this) + (TDynamicVector<T>)m);
   }
-  TDynamicMatrix operator-(const TDynamicMatrix& m)
+  TDynamicMatrix operator-(TDynamicMatrix& m)
   {
     return TDynamicMatrix((TDynamicVector<T>)(*this) - (TDynamicVector<T>)m);
   }
@@ -308,7 +316,7 @@ public:
   friend std::ostream& operator<<(std::ostream& ostr, const TDynamicMatrix& v)
   {
       for (int i = 0; i < v.sz; i++)
-          ostr << v[i];
+          ostr << v[i] << ' ';
     return ostr;
   }
 };

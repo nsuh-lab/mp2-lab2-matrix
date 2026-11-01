@@ -106,7 +106,18 @@ TEST(TDynamicVector, vectors_with_different_size_are_not_equal)
 
 TEST(TDynamicVector, can_add_scalar_to_vector)
 {
-  ADD_FAILURE();
+	int c = 5;
+	TDynamicVector<int> v(5);
+	TDynamicVector<int> res(5);
+	TDynamicVector<int> expected(5);
+
+	for (int i = 0; i < v.size(); i++)
+		v[i] = i;
+	for (int i = 0; i < expected.size(); i++)
+		expected[i] = i + 5;
+	res = v + 5;
+
+	EXPECT_EQ(res, expected);
 }
 
 TEST(TDynamicVector, can_subtract_scalar_from_vector)
@@ -164,7 +175,7 @@ TEST(TDynamicVector, can_read_vector)
 
 TEST(TDynamicVector, can_write_vector)
 {
-  TDynamicVector<int> v;
+  TDynamicVector<int> v(5);
   for (int i = 0; i < 5; i++) v[i] = i;
   std::string expected = "1 2 3 4 5 ";
   

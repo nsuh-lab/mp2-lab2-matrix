@@ -25,7 +25,11 @@ public:
   {
     if (sz == 0)
       throw std::out_of_range("Vector size should be greater than zero");
+    if (sz > MAX_VECTOR_SIZE)
+        throw "Vector size is bigger than max vector size";
     pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
+    for (int i = 0; i < sz; i++)
+        pMem[i] = 0;
   }
   TDynamicVector(T* arr, size_t s) : sz(s)
   {
@@ -128,29 +132,83 @@ public:
   // скалярные операции
   TDynamicVector operator+(T val)
   {
-    return TDynamicVector{};
+    TDynamicVector tmp(sz);
+    tmp = *this;
+    for (int i = 0; i < sz; i++)
+        tmp.pMem[i] += val;
+    return tmp;
   }
   TDynamicVector operator-(double val)
   {
-    return TDynamicVector{};
+    TDynamicVector tmp(sz);
+    tmp = *this;
+    for (int i = 0; i < sz; i++)
+        tmp.pMem[i] -= val;
+    return tmp;
   }
   TDynamicVector operator*(double val)
   {
-    return TDynamicVector{};
+    TDynamicVector tmp(sz);
+    tmp = *this;
+    for (int i = 0; i < sz; i++)
+        tmp.pMem[i] *= val;
+    return tmp;
   }
 
   // векторные операции
   TDynamicVector operator+(const TDynamicVector& v)
   {
-    return TDynamicVector{};
+    int size = 0;
+    if (sz > v.size()) {
+        size = sz;
+        TDynamicVector tmp(size);
+        tmp = *this;
+        for (int i = 0; i < v.size(); i++)
+            tmp[i] = pMem[i] + v[i];
+        return tmp;
+    }
+    else {
+        size = v.size();
+        TDynamicVector tmp(size);
+        tmp = v;
+        for (int i = 0; i < sz; i++)
+            tmp[i] = pMem[i] + v[i];
+        return tmp;
+    }
   }
   TDynamicVector operator-(const TDynamicVector& v)
   {
-    return TDynamicVector{};
+     int size = 0;
+     if (sz > v.size()) {
+         size = sz;
+         TDynamicVector tmp(size);
+         tmp = *this;
+         for (int i = 0; i < v.size(); i++)
+             tmp[i] = pMem[i] - v[i];
+         return tmp;
+     }
+     else {
+         size = v.size();
+         TDynamicVector tmp(size);
+         tmp = v;
+         for (int i = 0; i < sz; i++)
+             tmp[i] = pMem[i] - v[i];
+         return tmp;
+     }
   }
   T operator*(const TDynamicVector& v) //noexcept(noexcept(T()))
   {
-    return T{};
+    T res;
+    if (sz > v.sz) {
+        for (int i = 0; i < v.sz; i++)
+            res += pMem[i] * v[i];
+        return res;
+    }
+    else {
+        for (int i = 0; i < sz; i++)
+            res += pMem[i] * v[i];
+        return res;
+    }
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
